@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Free Audit</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: #f5f7fb;
+      color: #1a1d29;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      background: #fff;
+      width: 100%;
+      max-width: 420px;
+      padding: 32px 28px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+    h1 { font-size: 1.6rem; margin-bottom: 8px; }
+    p.sub { color: #5b6170; margin-bottom: 24px; line-height: 1.5; }
+    label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 6px; }
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #d5d9e2;
+      border-radius: 10px;
+      font-size: 1rem;
+      margin-bottom: 16px;
+    }
+    input:focus { outline: none; border-color: #4a6cf7; }
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: #4a6cf7;
+      color: #fff;
+    }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .pay-btn {
+      margin-top: 12px;
+      background: #1a1d29;
+      text-decoration: none;
+      display: block;
+      text-align: center;
+    }
+    .status { margin-top: 16px; text-align: center; font-weight: 600; min-height: 1.2em; }
+    .status.ok { color: #1a8f4c; }
+    .status.err { color: #c0392b; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>Free Audit</h1>
+    <p class="sub">Unga details kudunga, audit-ku register pannikalam.</p>
+
+    <form id="auditForm" novalidate>
+      <label for="name">Name</label>
+      <input type="text" id="name" name="name" placeholder="Your name" required />
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" placeholder="you@example.com" required />
+
+      <label for="phone">Phone</label>
+      <input type="tel" id="phone" name="phone" placeholder="10-digit mobile number" required />
+
+      <button type="submit" id="submitBtn">Submit</button>
+    </form>
+
+    <a class="pay-btn" href="https://payments.cashfree.com/forms/getaudit" target="_blank" rel="noopener">
+      Free Audit for ₹1
+    </a>
+
+    <div class="status" id="status"></div>
+  </div>
+
+  <script>
+    // Apps Script Web App URL
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwrTyLTflzsMDp4k8QHrL7QbsAkG1tWFK5xI1CqZOuIhiOg6cyDYvg_-TEPTeUG7E1f/exec";
+
+    const form = document.getElementById("auditForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const statusEl = document.getElementById("status");
+
+    function showSuccess() {
+      statusEl.className = "status ok";
+      statusEl.textContent = "Submit aayiduchu! Thank you.";
+      form.reset();
+      submitBtn.disabled = false;
+    }
+
+    function showError() {
+      statusEl.className = "status err";
+      statusEl.textContent = "Edho thappu nadandhuduchu. Konjam kalichu marubadiyum try pannunga.";
+      submitBtn.disabled = false;
+    }
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+
+      if (!name || !email || !phone) {
+        statusEl.className = "status err";
+        statusEl.textContent = "Ella fields-aiyum fill pannunga.";
+        return;
+      }
+
+      statusEl.textContent = "";
+      submitBtn.disabled = true;
+
+      const url = SCRIPT_URL + "?" + new URLSearchParams({ name, email, phone });
+
+      fetch(url, { method: "GET", mode: "no-cors" })
+        .then(() => showSuccess())
+        .catch(() => showError());
+    });
+  </script>
+
+</body>
+</html>
